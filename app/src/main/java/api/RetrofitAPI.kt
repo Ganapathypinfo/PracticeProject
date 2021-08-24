@@ -1,6 +1,5 @@
 package api
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,7 +11,6 @@ import kotlinx.coroutines.launch
 //
 class RetrofitAPI(private val usersListURL: String) : API {
 
-
     override fun fetchUsersList(
         excludingUserWithID: String?,
         success: (UsersList) -> Unit,
@@ -22,16 +20,11 @@ class RetrofitAPI(private val usersListURL: String) : API {
             try {
                 var users = RemoteService.remoteCall(usersListURL).fetchUsers()
                 if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
-                    Log.d("RetrofitAPI","excludingUserWithID: ${excludingUserWithID}")
                     val myUser = users.find  {
                        user -> user.id.toString().equals(excludingUserWithID)
-
-
                     }
 
-                    var usersMinus = users.toMutableList().minus( myUser) //(users.toMutableList().remove(myUser))
-                    Log.d("RetrofitAPI","myUser.id: ${myUser?.id.toString()}, ${myUser?.name}")
-                    Log.d("RetrofitAPI","usersMinus.size: ${usersMinus.size}")
+                    var usersMinus = users.toMutableList().minus( myUser)
                     success(usersMinus.reversed())
                 }else{
                     success(users.reversed())
