@@ -65,7 +65,6 @@ class InfoActivity : ComponentActivity() {
                         contentColor = Color.Black
                     ) {
                         DisplayUserListShows (usersListDetails = usersList){}
-
                     }
                 }
             })
@@ -74,83 +73,5 @@ class InfoActivity : ComponentActivity() {
             Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
         })
 
-       /*
-        setContent {
-
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-//                    ViewMoreInfo( userModel)
-                    DisplayUserListShows (usersListDetails = usersList ){
-                        startActivity(InfoActivity.intent(this,it))
-                        usersList.toMutableList().remove(it)
-
-                    }
-                }
-
-        }*/
     }
 }
-/*
-@Composable
-fun ViewMoreInfo(userModel: UserModel) {
-    val scrollState = rememberScrollState()
-    Card(
-        modifier = Modifier.padding(10.dp),
-        elevation = 10.dp,
-        shape = RoundedCornerShape(corner = CornerSize(10.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-                .padding(10.dp)
-        ) {
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = userModel.name,
-                style = MaterialTheme.typography.h3
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = userModel.username,
-                style = MaterialTheme.typography.h5
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Adderss",
-                style = MaterialTheme.typography.h5, fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "${userModel.address.street}, ${userModel.address.city} - ${userModel.address.zipcode}",
-                style = MaterialTheme.typography.h5, fontWeight = FontWeight.Light
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Email : ${userModel.email}",
-                style = MaterialTheme.typography.h5, fontWeight = FontWeight.Light
-            )
-
-        }
-    }
-}
-
-
-@Composable
-fun DisplayUserListShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
-
-    val userItems = remember { usersListDetails}
-    LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp,vertical = 8.dp)
-    ) {
-        items(
-            items = userItems,
-            itemContent = {
-                UserListItem(userModel = it, selectedItem)
-            }
-        )
-    }
-
-}*/
-
