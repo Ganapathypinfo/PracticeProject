@@ -1,5 +1,6 @@
 package api
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,8 +20,22 @@ class RetrofitAPI(private val usersListURL: String) : API {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val users = RemoteService.remoteCall(usersListURL).fetchUsers()
-                success(users.reversed())
+                var users = RemoteService.remoteCall(usersListURL).fetchUsers()
+                if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
+                    Log.d("RetrofitAPI","excludingUserWithID: ${excludingUserWithID}")
+                    val myUser = users.find  {
+                       user -> user.id.toString().equals(excludingUserWithID)
+
+
+                    }
+
+                    var usersMinus = users.toMutableList().minus( myUser) //(users.toMutableList().remove(myUser))
+                    Log.d("RetrofitAPI","myUser.id: ${myUser?.id.toString()}, ${myUser?.name}")
+                    Log.d("RetrofitAPI","usersMinus.size: ${usersMinus.size}")
+                    success(usersMinus.reversed())
+                }else{
+                    success(users.reversed())
+                }
             }catch (ex:Exception){
                 failure(ex)
             }

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import api.API
+import api.UsersList
 import com.example.practice.components.UserListItem
 import com.example.practice.model.UserModel
 import kotlinx.coroutines.*
@@ -32,9 +33,7 @@ class MainActivity : ComponentActivity() {
         var usersList by mutableStateOf(listOf<UserModel>())
 
         api.create().fetchUsersList("", {
-            Log.d(TAG, (it as List<UserModel>).size.toString())
-            Log.d(TAG, it.get(1).name)
-            usersList = it
+            usersList = it as List<UserModel>
             this@MainActivity.runOnUiThread (java.lang.Runnable {
                 setContent {
                     Surface(
@@ -42,35 +41,41 @@ class MainActivity : ComponentActivity() {
                         color = Color.LightGray,
                         contentColor = Color.Black
                     ) {
-                        val peoples: List<UserModel> = remember { usersList }
-
-                        DisplayTvShows (usersListDetails = peoples ){
+                         var people = usersList
+                        DisplayUserListShows (usersListDetails = people ){
                             startActivity(InfoActivity.intent(this,it))
                         }
 
                     }
                 }
             })
+
         }, {
             Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
         })
+
+
 
     }
 }
 
 @Composable
-fun DisplayTvShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
+fun DisplayUserListShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
 
-    val tvShows = remember { usersListDetails}
+    var userItems = remember { usersListDetails}
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp,vertical = 8.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp,vertical = 8.dp),
+
     ) {
         items(
-            items = tvShows,
+            items = userItems,
             itemContent = {
-                UserListItem(userModel = it, selectedItem)
+                UserListItem(userModel = it, selectedItem)/*{
+                    userItems = userItems.toMutableList().minus( it)
+                }*/
             }
         )
     }
 
 }
+
