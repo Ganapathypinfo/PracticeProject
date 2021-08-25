@@ -2,6 +2,7 @@ package com.example.practice
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
         mainViewModel.getUsers("")?.observe(this, Observer {
             Log.d(TAG, (it as List<UserModel>).size.toString())
-            usersList = mainViewModel.getUseLivedata()?.value!!
+            usersList = it
             setContent {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -43,11 +44,11 @@ class MainActivity : ComponentActivity() {
                     contentColor = Color.Black
                 ) {
 
-                    DisplayTvShows (usersListDetails = usersList ){
+                    DisplayUserListShows (usersListDetails = mainViewModel.getUseLivedata()?.value!! ){
                         var id = it.id.toString()
                         mainViewModel.getUsers(id)?.observe(this, Observer {
-                            Log.d(TAG, "second : ${(it as List<UserModel>).size.toString()}")
-                            usersList = mainViewModel.getUseLivedata()?.value!!
+                            Log.d(TAG, "second : ${(it as List<UserModel>).size}")
+                                simulateHotReload(this)
                         })
 
                     }
@@ -58,15 +59,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
-fun DisplayTvShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
+fun DisplayUserListShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
 
     val tvShows = remember { usersListDetails}
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp,vertical = 8.dp)
     ) {
         items(
-            items = tvShows,
+            items = usersListDetails,
             itemContent = {
                 UserListItem(userModel = it, selectedItem)
             }
