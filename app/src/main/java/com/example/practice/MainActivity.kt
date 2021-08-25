@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,31 +27,33 @@ import kotlinx.coroutines.*
 class MainActivity : ComponentActivity() {
     val TAG: String = "MainActivity"
 
+    val mainViewModel:MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var api = API
         var usersList by mutableStateOf(listOf<UserModel>())
 
-        api.create().fetchUsersList("", {
+        mainViewModel.fetchUsersList("", {
             Log.d(TAG, (it as List<UserModel>).size.toString())
             Log.d(TAG, it.get(1).name)
-            usersList = it
-            this@MainActivity.runOnUiThread (java.lang.Runnable {
+            mainViewModel.getUsers()?.value = it
                 setContent {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = Color.LightGray,
                         contentColor = Color.Black
                     ) {
-                        val peoples: List<UserModel> = remember { usersList }
 
-                        DisplayTvShows (usersListDetails = peoples ){
-                            startActivity(InfoActivity.intent(this,it))
+                        DisplayTvShows (usersListDetails = mainViewModel.getUsers()?.value!! ){
+//                            startActivity(InfoActivity.intent(this,it))
+                            var id = it.id.toString()
+                            mainViewModel.fetchUsersList(id,{
+                                Log.d(TAG, "second : ${(it as List<UserModel>).size.toString()}")
+                            } ,{Log.d(TAG, "second : fetch fail >>> ${(it as Exception).message}")})
                         }
 
                     }
                 }
-            })
         }, {
             Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
         })
