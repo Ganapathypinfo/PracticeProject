@@ -43,16 +43,11 @@ class MainViewModel( ): ViewModel(){
                     userItems = userItems.reversed()
 
                     if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
-
-                        val myUser = userItems.find  {
-                                user -> user.id.toString().equals(excludingUserWithID)
+                        for(user in userItems){
+                            if((user.id.toString()).equals(excludingUserWithID)){
+                                userItems = userItems.minus(user)
+                            }
                         }
-
-                       /* var usersMinus = userItems.toMutableList().minus(myUser)
-                        usersList?.value = usersMinus*/
-                        Log.d(TAG, "before userItems.size : ${userItems.size}")
-                        userItems.minus(myUser)
-                        Log.d(TAG, "after userItems.size : ${userItems.size}")
                         usersList?.value = userItems
                         setLivedata(usersList)
 
@@ -62,7 +57,6 @@ class MainViewModel( ): ViewModel(){
                     }
                 }
             }
-
 
         //finally we will return the list
         return usersList
