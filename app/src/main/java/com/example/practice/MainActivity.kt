@@ -44,7 +44,6 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     DisplayTvShows (usersListDetails = usersList ){
-//                            startActivity(InfoActivity.intent(this,it))
                         var id = it.id.toString()
                         mainViewModel.getUsers(id)?.observe(this, Observer {
                             Log.d(TAG, "second : ${(it as List<UserModel>).size.toString()}")
@@ -56,33 +55,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         })
-
-
-        /*mainViewModel.fetchUsersList("", {
-            Log.d(TAG, (it as List<UserModel>).size.toString())
-            Log.d(TAG, it.get(1).name)
-            mainViewModel.getUsers()?.value = it
-                setContent {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = Color.LightGray,
-                        contentColor = Color.Black
-                    ) {
-
-                        DisplayTvShows (usersListDetails = mainViewModel.getUsers()?.value!! ){
-//                            startActivity(InfoActivity.intent(this,it))
-                            var id = it.id.toString()
-                            mainViewModel.fetchUsersList(id,{
-                                Log.d(TAG, "second : ${(it as List<UserModel>).size.toString()}")
-                            } ,{Log.d(TAG, "second : fetch fail >>> ${(it as Exception).message}")})
-                        }
-
-                    }
-                }
-        }, {
-            Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
-        })*/
-
     }
 }
 

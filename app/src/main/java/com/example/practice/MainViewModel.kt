@@ -34,27 +34,25 @@ class MainViewModel( ): ViewModel(){
     //we will call this method to get the data
     fun getUsers(excludingUserWithID: String): MutableLiveData<List<UserModel>>? {
         //if the list is null
-        if (usersList == null) {
+
             usersList = MutableLiveData<List<UserModel>>()
             //we will load it asynchronously from server in this method
             viewModelScope.launch {
                 RemoteService.remoteCall(API.usersListURL).apply {
                     var userItems = fetchUsers()
-                    userItems.reversed()
-//                    usersList?.value = userItems.reversed()
-//                    setLivedata(usersList!!)
+                    userItems = userItems.reversed()
 
                     if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
 
                         val myUser = userItems.find  {
                                 user -> user.id.toString().equals(excludingUserWithID)
-                        }/*
+                        }
 
-                        var usersMinus = userItems.toMutableList().minus(myUser)
-                        usersList. = usersMinus*/
-//                        usersList?.value = userItems
-                            userItems.toList().minus(myUser)
-//                        userItems.dropLast(10)
+                       /* var usersMinus = userItems.toMutableList().minus(myUser)
+                        usersList?.value = usersMinus*/
+                        Log.d(TAG, "before userItems.size : ${userItems.size}")
+                        userItems.minus(myUser)
+                        Log.d(TAG, "after userItems.size : ${userItems.size}")
                         usersList?.value = userItems
                         setLivedata(usersList)
 
@@ -64,37 +62,12 @@ class MainViewModel( ): ViewModel(){
                     }
                 }
             }
-        }
+
 
         //finally we will return the list
         return usersList
     }
 
-   /* override fun fetchUsersList(
-        excludingUserWithID: String?,
-        success: (UsersList) -> Unit,
-        failure: (FetchError) -> Unit
-    ) {
-        viewModelScope.launch {
-            try {
-                val users = RemoteService.remoteCall(API.usersListURL).fetchUsers()
-                if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
-                    val myUser = users.find  {
-                            user -> user.id.toString().equals(excludingUserWithID)
-                    }
-
-                    var usersMinus = users.toMutableList().minus( myUser)
-
-                    success(usersMinus.reversed())
-
-                }else{
-                    success(users.reversed())
-                }
-            }catch (ex:Exception){
-                failure(ex)
-            }
-        }
-    }*/
 
 
 }
