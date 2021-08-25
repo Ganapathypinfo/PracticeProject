@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import api.API
 import com.example.practice.components.UserListItem
@@ -30,10 +31,34 @@ class MainActivity : ComponentActivity() {
     val mainViewModel:MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var api = API
         var usersList by mutableStateOf(listOf<UserModel>())
 
-        mainViewModel.fetchUsersList("", {
+        mainViewModel.getUsers("")?.observe(this, Observer {
+            Log.d(TAG, (it as List<UserModel>).size.toString())
+            usersList = mainViewModel.getUseLivedata()?.value!!
+            setContent {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.LightGray,
+                    contentColor = Color.Black
+                ) {
+
+                    DisplayTvShows (usersListDetails = usersList ){
+//                            startActivity(InfoActivity.intent(this,it))
+                        var id = it.id.toString()
+                        mainViewModel.getUsers(id)?.observe(this, Observer {
+                            Log.d(TAG, "second : ${(it as List<UserModel>).size.toString()}")
+                            usersList = mainViewModel.getUseLivedata()?.value!!
+                        })
+
+                    }
+
+                }
+            }
+        })
+
+
+        /*mainViewModel.fetchUsersList("", {
             Log.d(TAG, (it as List<UserModel>).size.toString())
             Log.d(TAG, it.get(1).name)
             mainViewModel.getUsers()?.value = it
@@ -56,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 }
         }, {
             Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
-        })
+        })*/
 
     }
 }

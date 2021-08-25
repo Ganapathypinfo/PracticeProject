@@ -21,25 +21,56 @@ import retrofit2.Retrofit
 
 
 
-class MainViewModel( ): ViewModel(),API{
+class MainViewModel( ): ViewModel(){
     val TAG : String = this.javaClass.simpleName
     private var usersList: MutableLiveData<List<UserModel>>? = null
 
+    fun getUseLivedata():MutableLiveData<List<UserModel>>?{
+        return usersList
+    }
+    fun setLivedata(listUser:MutableLiveData<List<UserModel>>?){
+        usersList = listUser
+    }
     //we will call this method to get the data
-    fun getUsers(): MutableLiveData<List<UserModel>>? {
+    fun getUsers(excludingUserWithID: String): MutableLiveData<List<UserModel>>? {
         //if the list is null
         if (usersList == null) {
             usersList = MutableLiveData<List<UserModel>>()
             //we will load it asynchronously from server in this method
-//            loadusersList()
+            viewModelScope.launch {
+                RemoteService.remoteCall(API.usersListURL).apply {
+                    var userItems = fetchUsers()
+                    userItems.reversed()
+//                    usersList?.value = userItems.reversed()
+//                    setLivedata(usersList!!)
 
+                    if(excludingUserWithID != null && excludingUserWithID.isNotEmpty()){
+
+                        val myUser = userItems.find  {
+                                user -> user.id.toString().equals(excludingUserWithID)
+                        }/*
+
+                        var usersMinus = userItems.toMutableList().minus(myUser)
+                        usersList. = usersMinus*/
+//                        usersList?.value = userItems
+                            userItems.toList().minus(myUser)
+//                        userItems.dropLast(10)
+                        usersList?.value = userItems
+                        setLivedata(usersList)
+
+                    }else{
+                        usersList?.value = userItems
+                        setLivedata(usersList)
+                    }
+                }
+            }
         }
 
         //finally we will return the list
         return usersList
     }
 
-    override fun fetchUsersList(
+   /* override fun fetchUsersList(
         excludingUserWithID: String?,
         success: (UsersList) -> Unit,
         failure: (FetchError) -> Unit
@@ -53,7 +84,9 @@ class MainViewModel( ): ViewModel(),API{
                     }
 
                     var usersMinus = users.toMutableList().minus( myUser)
+
                     success(usersMinus.reversed())
+
                 }else{
                     success(users.reversed())
                 }
@@ -61,7 +94,7 @@ class MainViewModel( ): ViewModel(),API{
                 failure(ex)
             }
         }
-    }
+    }*/
 
 
 }
