@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
                         color = Color.LightGray,
                         contentColor = Color.Black
                     ) {
-
                         mainViewModel.getUseLivedata()?.value?.let { it1 ->
                             DisplayUserListShows(usersListDetails = it1) {
                                 if (!isNetworkConnected()) {
@@ -51,10 +50,8 @@ class MainActivity : ComponentActivity() {
                                         simulateHotReload(this)
                                     })
                                 }
-
                             }
                         }
-
                     }
                 }
             })
@@ -90,13 +87,10 @@ class MainActivity : ComponentActivity() {
                     ConnectivityManager.TYPE_ETHERNET -> true
                     else -> false
                 }
-
             }
         }
         return result
     }
-
-
 }
 
 @Composable
@@ -106,10 +100,7 @@ fun DisplayUserListShows(usersListDetails: List<UserModel>, selectedItem: (UserM
     ) {
         items(
             items = usersListDetails,
-            itemContent = {
-                UserListItem(userModel = it, selectedItem)
-            }
+            itemContent = { UserListItem(userModel = it, selectedItem) },
         )
     }
-
 }
