@@ -31,9 +31,9 @@ interface API {
 
         // TODO: Instantiate an API object as follows to use within the app
 
-        fun create() : API {
+       /* fun create() : API {
             return RetrofitAPI(usersListURL = usersListURL)
-        }
+        }*/
 
     }
 

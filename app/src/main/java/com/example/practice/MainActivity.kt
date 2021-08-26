@@ -5,13 +5,9 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.Window
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,9 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.AdapterListUpdateCallback
-import api.API
 import com.example.practice.components.UserListItem
 import com.example.practice.model.UserModel
 import kotlinx.coroutines.*
@@ -34,15 +27,13 @@ import kotlinx.coroutines.*
 // Note: A nice looking UI is appreciated but clean code is more important
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
-    val TAG: String = this.javaClass.simpleName
-    val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!isNetworkConnected()) {
-            showNativeAlertDialod()
+            showNativeAlertDialog()
         } else {
-            mainViewModel.getUsers("")?.observe(this, Observer {
-                Log.d(TAG, (it as List<UserModel>).size.toString())
+            mainViewModel.getUsers("")?.observe(this, {
                 setContent {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -50,16 +41,18 @@ class MainActivity : ComponentActivity() {
                         contentColor = Color.Black
                     ) {
 
-                        DisplayUserListShows(usersListDetails = mainViewModel.getUseLivedata()?.value!!) {
-                            if (!isNetworkConnected()) {
-                                showNativeAlertDialod()
-                            } else {
-                                var id = it.id.toString()
-                                mainViewModel.getUsers(id)?.observe(this, Observer {
-                                    simulateHotReload(this)
-                                })
-                            }
+                        mainViewModel.getUseLivedata()?.value?.let { it1 ->
+                            DisplayUserListShows(usersListDetails = it1) {
+                                if (!isNetworkConnected()) {
+                                    showNativeAlertDialog()
+                                } else {
+                                    val id = it.id.toString()
+                                    mainViewModel.getUsers(id)?.observe(this, {
+                                        simulateHotReload(this)
+                                    })
+                                }
 
+                            }
                         }
 
                     }
@@ -68,7 +61,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showNativeAlertDialod() {
+    private fun showNativeAlertDialog() {
         AlertDialog.Builder(this).setTitle(getString(R.string.title_network_info))
             .setMessage(getString(R.string.network_info))
             .setPositiveButton(android.R.string.ok) { _, _ -> }
@@ -108,8 +101,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DisplayUserListShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
-
-    val tvShows = remember { usersListDetails }
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
