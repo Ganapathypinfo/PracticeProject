@@ -1,22 +1,34 @@
 package com.example.practice
 
-import android.os.Bundle
-import android.util.Log
+import android.content.Context
+import android.net.ConnectivityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.recyclerview.widget.AdapterListUpdateCallback
-import api.API
 import com.example.practice.components.UserListItem
-import com.example.practice.model.UserModel
+import com.example.practice.model.UsersList
+import com.example.practice.model.UsersListItem
 import kotlinx.coroutines.*
 
 
@@ -24,53 +36,105 @@ import kotlinx.coroutines.*
 // Note: A nice looking UI is appreciated but clean code is more important
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
-    val TAG: String = "MainActivity"
-
+    private val mainViewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var api = API
-        var usersList by mutableStateOf(listOf<UserModel>())
+        if (!isNetworkConnected()) {
+            showNativeAlertDialog()
+        } else {
+            mainViewModel.fetchUserList("")
+             setContent{
+                val userDataState by mainViewModel.userDataState.observeAsState(MainViewModel.UserDataState.Loading)
+                 Surface(
+                     modifier = Modifier.fillMaxSize(),
+                     color = Color.LightGray,
+                     contentColor = Color.Black
+                 ){
+                     userDataState.let {
+                         when(it){
+                             is MainViewModel.UserDataState.Loading ->{
+                                 loadingUi()
+                             }
+                             is MainViewModel.UserDataState.ShowUsers ->{
+                                 it.usersList.let { items ->
+                                     if (items != null) {
+                                         DisplayUserListShows(usersListDetails = items.usersList!!){
+                                             mainViewModel.fetchUserList(excludingUserId = it.id.toString())
+                                         }
+                                     }
 
-        api.create().fetchUsersList("", {
-            Log.d(TAG, (it as List<UserModel>).size.toString())
-            Log.d(TAG, it.get(1).name)
-            usersList = it
-            this@MainActivity.runOnUiThread (java.lang.Runnable {
-                setContent {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = Color.LightGray,
-                        contentColor = Color.Black
-                    ) {
-                        val peoples: List<UserModel> = remember { usersList }
+                                 }
 
-                        DisplayTvShows (usersListDetails = peoples ){
-                            startActivity(InfoActivity.intent(this,it))
-                        }
+                             }
 
-                    }
+                         }
+                     }
+                 }
+        }
+        }
+    }
+
+    private fun showNativeAlertDialog() {
+        AlertDialog.Builder(this).setTitle(getString(R.string.title_network_info))
+            .setMessage(getString(R.string.network_info))
+            .setPositiveButton(android.R.string.ok) { _, _ -> }
+            .setIcon(android.R.drawable.ic_dialog_alert).show()
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        var result = false
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val networkCapabilities = connectivityManager.activeNetwork ?: return false
+            val actNw =
+                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            result = when {
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.activeNetworkInfo?.run {
+                result = when (type) {
+                    ConnectivityManager.TYPE_WIFI -> true
+                    ConnectivityManager.TYPE_MOBILE -> true
+                    ConnectivityManager.TYPE_ETHERNET -> true
+                    else -> false
                 }
-            })
-        }, {
-            Log.d(TAG, "fetch fail >>> ${(it as Exception).message}")
-        })
-
+            }
+        }
+        return result
     }
 }
 
 @Composable
-fun DisplayTvShows(usersListDetails: List<UserModel>, selectedItem: (UserModel) -> Unit) {
-
-    val tvShows = remember { usersListDetails}
+fun DisplayUserListShows(usersListDetails: List<UsersListItem?>?, selectedItem: (UsersListItem) -> Unit) {
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp,vertical = 8.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
         items(
-            items = tvShows,
+            items = usersListDetails!!,
             itemContent = {
-                UserListItem(userModel = it, selectedItem)
-            }
+                if (it != null) {
+                    UserListItem(userModel = it, selectedItem)
+                }
+            },
         )
     }
+}
 
+
+/**
+ * Composable function show loading ui screen
+ */
+@Composable
+fun loadingUi(){
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .wrapContentSize(Alignment.Center)) {
+        Text(text = "Loading...",
+            style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+    }
 }

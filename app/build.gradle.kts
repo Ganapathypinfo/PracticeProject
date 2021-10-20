@@ -64,11 +64,20 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+
+    // Just try jepack state
+    implementation("androidx.compose.runtime:runtime-livedata:${rootProject.extra["compose_version"]}")
 
     // kotlin - coroutines
     // Ref: https://github.com/Kotlin/kotlinx.coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
+
+    testImplementation("io.strikt:strikt-core:0.31.0")
+    testImplementation ("org.robolectric:robolectric:4.4")
 
     testImplementation("junit:junit:4.+")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")

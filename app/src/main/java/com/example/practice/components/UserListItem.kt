@@ -14,10 +14,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.practice.model.UserModel
+import com.example.practice.model.UsersList
+import com.example.practice.model.UsersListItem
 
 @Composable
-fun UserListItem(userModel: UserModel, selectedItem: (UserModel) -> Unit) {
+fun UserListItem(userModel: UsersListItem, selectedItem: (UsersListItem) -> Unit) {
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -33,9 +34,9 @@ fun UserListItem(userModel: UserModel, selectedItem: (UserModel) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = userModel.name, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                userModel.name?.let { Text(text = it, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold) }
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "Company : ${userModel.company.name}", fontSize = 16.sp, fontWeight = FontWeight.Light)
+                Text(text = "Company : ${userModel.company?.name}", fontSize = 16.sp, fontWeight = FontWeight.Light)
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(text = "UserId : ${userModel.id.toString()}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(3.dp))
@@ -48,7 +49,7 @@ fun UserListItem(userModel: UserModel, selectedItem: (UserModel) -> Unit) {
                     overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Light
                 )
                 Spacer(modifier = Modifier.height(3.dp))
-                Text(text = "City : ${userModel.address.city}",fontSize = 16.sp, fontWeight = FontWeight.Light)
+                Text(text = "City : ${userModel.address?.city}",fontSize = 16.sp, fontWeight = FontWeight.Light)
 
 
             }
