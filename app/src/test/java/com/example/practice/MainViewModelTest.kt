@@ -1,7 +1,7 @@
 package com.example.practice
 
 import androidx.lifecycle.MutableLiveData
-import com.example.practice.model.UserModel
+import com.example.practice.model.UsersList
 import org.junit.Assert.*
 import org.junit.Before
 
@@ -9,7 +9,7 @@ import org.junit.Test
 
 class MainViewModelTest {
     lateinit var mainViewModel:MainViewModel
-    private var usersList: MutableLiveData<List<UserModel>>? = null
+    private var usersList: MutableLiveData<List<UsersList>>? = null
 
     @Before
     fun setup(){
@@ -18,7 +18,7 @@ class MainViewModelTest {
 
     @Test
     fun getUseLivedata() {
-        assertEquals(mainViewModel.getUseLivedata(), usersList)
+        assertEquals(mainViewModel.fetchUserList(""), usersList)
     }
 
 

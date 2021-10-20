@@ -1,5 +1,15 @@
 package api
 
+import com.example.practice.BuildConfig
+import com.example.practice.model.UsersList
+import com.google.gson.GsonBuilder
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.Exception
+
 // A networking API used within the app.
 //
 // Implement the API using retrofit, ktor or any networking library of your choice
@@ -31,9 +41,27 @@ interface API {
 
         // TODO: Instantiate an API object as follows to use within the app
 
-       /* fun create() : API {
-            return RetrofitAPI(usersListURL = usersListURL)
-        }*/
+        /**
+         * Function will return UserApi service using retrofit
+         * @return : User Api service interface
+         */
+        fun create() : RemoteInterface {
+            val build = Retrofit.Builder()
+                .baseUrl(usersListURL)
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
+                .client(OkHttpClient().newBuilder().apply {
+                    // add logging interceptor last to view others interceptors
+                    if (BuildConfig.DEBUG) {
+                        val logging = HttpLoggingInterceptor().also {
+                            it.level = HttpLoggingInterceptor.Level.BODY
+                        }
+                        this.addInterceptor(logging)
+                    }
+                }.build())
+                .build()
+            return build.create(RemoteInterface::class.java)
+        }
 
     }
 
@@ -45,12 +73,14 @@ interface API {
 // Make sure to limit the data inside this data-type to whats required in the assignment.
 // Do not include any other information, e.g. phone number, zipcode... if its not required
 //
-typealias UsersList = Any
+//typealias UsersList = Any
 
 // TODO (Bonus): Create a more specific error type.
 // This can help identify the nature of a particular failure case.
 // e.g. network timeout, badly formatted request or failing to decode/deserialize
 // a response could cause failure in a network request.
 //
-typealias FetchError = Any
+class FetchError(var exception: Exception, val errorMessage: String?) : Exception(errorMessage, exception)
+
+
 

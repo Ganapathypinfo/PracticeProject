@@ -1,9 +1,10 @@
 package api
 
-import com.example.practice.model.UserModel
+import com.example.practice.model.UsersListItem
+import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 
 interface RemoteInterface {
     @GET("users/")
-    suspend fun fetchUsers():List<UserModel>
+    fun fetchUsers(): Deferred<List<UsersListItem?>?>
 }

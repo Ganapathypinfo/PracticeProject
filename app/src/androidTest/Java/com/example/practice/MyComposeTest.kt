@@ -2,24 +2,17 @@ package com.example.practice
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.simulateHotReload
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.practice.model.UserModel
+import com.example.practice.model.UsersListItem
 import junit.framework.Assert.assertTrue
 import org.junit.Assert
 import org.junit.Rule
@@ -39,7 +32,7 @@ class MyComposeTest {
 
     @Test
     fun screentest(){
-        var usersList by mutableStateOf(listOf<UserModel>()) // State that can cause recompositions
+        var usersList by mutableStateOf(listOf<UsersListItem>()) // State that can cause recompositions
         var lastSeenValue = 0 // Used to track recompositions
         composeTestRule.setContent {
             Surface(
@@ -54,14 +47,11 @@ class MyComposeTest {
                 }
             }
         }
-//        myCounter.value = 1 // The state changes, but there is no recomposition
 
         // Fails because nothing triggered a recomposition
         assertTrue(lastSeenValue == 0)
         assertTrue(usersList.size == 0)
 
-        // Passes because the assertion triggers recomposition
-//        composeTestRule.onNodeWithText("1").assertExists()
     }
     @Test
     fun initial_zero() {
